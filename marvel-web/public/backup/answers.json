@@ -1,5 +1,5 @@
 {
-  "recordedAt": "2026-09-19T02:31:49.674Z",
+  "recordedAt": "2026-09-19T16:00:09.332Z",
   "missions": {
     "stones": {
       "graph": {
@@ -45,7 +45,7 @@
       },
       "alone": {
         "alone": {
-          "answer": "Stormbreaker, Mjolnir, Iron Man's nanotech armor, and the Infinity Gauntlet.",
+          "answer": "Stormbreaker, Mjolnir, Iron Man's nano gauntlet, Doctor Strange's magic, Scarlet Witch's powers.",
           "same": false,
           "missing": [
             "Captain America's Shield"
@@ -88,14 +88,15 @@
     },
     "path": {
       "graph": {
-        "answer": "Kate Bishop —[mentored]— Clint Barton —[member of]— Avengers —[member of]— Nebula —[enemy of]— Thanos (4 links)",
-        "cypher": "MATCH (a:Character {name:'Kate Bishop'}), (b:Character {name:'Thanos'}) CALL algo.SPpaths({sourceNode: a, targetNode: b, relTypes: ['MEMBER_OF','ENEMY_OF','MENTORED','WIELDED','PARENT_OF','SIBLING_OF','SPOUSE_OF','PARTNER_OF'], relDirection: 'both', maxLen: 6, pathCount: 1}) YIELD path RETURN [n IN nodes(path) | n.name] AS chain, [r IN relationships(path) | type(r)] AS links",
+        "answer": "Kate Bishop ←[mentored]— Hawkeye —[member of]→ Avengers ←[member of]— Nebula —[enemy of]→ Thanos (4 links)",
+        "cypher": "MATCH (a:Character {name:'Kate Bishop'}), (b:Character {name:'Thanos'}) CALL algo.SPpaths({sourceNode: a, targetNode: b, relTypes: ['MEMBER_OF','ENEMY_OF','MENTORED','WIELDED','PARENT_OF','SIBLING_OF','SPOUSE_OF','PARTNER_OF'], relDirection: 'both', maxLen: 6, pathCount: 1}) YIELD path RETURN [n IN nodes(path) | n.name] AS chain, [n IN nodes(path) | coalesce(n.alias, n.name)] AS heroes, [r IN relationships(path) | type(r)] AS links, [r IN relationships(path) | startNode(r).name] AS starts",
         "names": [
           "Kate Bishop",
           "Clint Barton",
           "Avengers",
           "Nebula",
           "Thanos",
+          "Hawkeye",
           "MENTORED",
           "MEMBER_OF",
           "ENEMY_OF"
@@ -103,10 +104,10 @@
       },
       "alone": {
         "alone": {
-          "answer": "No connection; Kate Bishop and Thanos never met or shared any storyline.",
+          "answer": "No connection.",
           "same": false,
           "missing": [
-            "Clint Barton (her mentor)"
+            "Hawkeye (her mentor)"
           ],
           "wrong": []
         }

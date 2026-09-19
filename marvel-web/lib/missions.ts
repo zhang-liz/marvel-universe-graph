@@ -46,7 +46,10 @@ export const MISSIONS: Mission[] = [
       "MATCH (c:Character)-[:HAS_POWER]->(p:Power {name:'flight'}), (c)-[:MEMBER_OF]->(t:Team {name:'Avengers'}), (c)-[:WIELDED]->(m:Item {name:'Mjolnir'}) RETURN c.name AS name, c.alias AS alias, t.name AS team, p.name AS power, m.name AS item ORDER BY name",
     answer: (rows) => rows.length ? `${list(rows.map((r) => r.alias || r.name))}.` : "Nobody.",
     must: [{ label: "Thor", words: ["thor"] }, { label: "Vision", words: ["vision"] }],
-    mustNot: [{ label: "Captain America", words: ["captain america", "steve rogers"], why: "He cannot fly." }],
+    mustNot: [
+      { label: "Captain America", words: ["captain america", "steve rogers"], why: "He cannot fly." },
+      { label: "Iron Man", words: ["iron man", "tony stark"], why: "He never held Mjolnir." },
+    ],
   },
   {
     id: "path",
@@ -54,13 +57,17 @@ export const MISSIONS: Mission[] = [
     step: "Find the link",
     question: "How is Kate Bishop connected to Thanos?",
     cypher:
-      "MATCH (a:Character {name:'Kate Bishop'}), (b:Character {name:'Thanos'}) CALL algo.SPpaths({sourceNode: a, targetNode: b, relTypes: ['MEMBER_OF','ENEMY_OF','MENTORED','WIELDED','PARENT_OF','SIBLING_OF','SPOUSE_OF','PARTNER_OF'], relDirection: 'both', maxLen: 6, pathCount: 1}) YIELD path RETURN [n IN nodes(path) | n.name] AS chain, [r IN relationships(path) | type(r)] AS links",
+      "MATCH (a:Character {name:'Kate Bishop'}), (b:Character {name:'Thanos'}) CALL algo.SPpaths({sourceNode: a, targetNode: b, relTypes: ['MEMBER_OF','ENEMY_OF','MENTORED','WIELDED','PARENT_OF','SIBLING_OF','SPOUSE_OF','PARTNER_OF'], relDirection: 'both', maxLen: 6, pathCount: 1}) YIELD path RETURN [n IN nodes(path) | n.name] AS chain, [n IN nodes(path) | coalesce(n.alias, n.name)] AS heroes, [r IN relationships(path) | type(r)] AS links, [r IN relationships(path) | startNode(r).name] AS starts",
     answer: (rows) => {
       if (!rows.length) return "The graph has no path between them.";
-      const chain = rows[0].chain as string[], links = rows[0].links as string[];
-      return chain.map((n, i) => (i < links.length ? `${n} —[${links[i].replace("_", " ").toLowerCase()}]— ` : n)).join("") + ` (${links.length} links)`;
+      const { chain, heroes, links, starts } = rows[0] as { chain: string[]; heroes: string[]; links: string[]; starts: string[] };
+      // The two ends keep the names from the question; the nodes between them show their hero name, as on the map.
+      const shown = chain.map((n, i) => (i === 0 || i === chain.length - 1 ? n : heroes[i]));
+      // The arrow shows the direction of the fact: "Kate Bishop ←[mentored]— Hawkeye" means that Hawkeye mentored her.
+      const hop = (i: number) => { const t = links[i].replace("_", " ").toLowerCase(); return starts[i] === chain[i] ? ` —[${t}]→ ` : ` ←[${t}]— `; };
+      return shown.map((n, i) => (i < links.length ? n + hop(i) : n)).join("") + ` (${links.length} links)`;
     },
-    must: [{ label: "Clint Barton (her mentor)", words: ["clint", "hawkeye"] }], // any chain through her mentor counts
+    must: [{ label: "Hawkeye (her mentor)", words: ["clint", "hawkeye"] }], // any chain through her mentor counts
   },
   {
     id: "trap",
