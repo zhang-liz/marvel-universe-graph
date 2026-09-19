@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #111;
+  --paper: #fff8e7;
+  --yellow: #ffd60a;
+  --red: #e23636;
+  --blue: #1e6bff;
+}
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-comic), "Comic Sans MS", system-ui, sans-serif;
+  background-color: var(--yellow);
+  /* halftone dots */
+  background-image: radial-gradient(rgba(0, 0, 0, 0.16) 1.5px, transparent 1.6px);
+  background-size: 12px 12px;
+}
+
+.bangers { font-family: var(--font-bangers), Impact, sans-serif; letter-spacing: 0.04em; }
+
+/* comic panel: thick ink border + hard offset shadow */
+.panel { background: var(--paper); border: 4px solid var(--ink); border-radius: 14px; box-shadow: 6px 6px 0 var(--ink); }
+.panel-dots { background-image: radial-gradient(rgba(30, 107, 255, 0.13) 1.5px, transparent 1.6px); background-size: 10px 10px; }
+
+.btn {
+  font-family: var(--font-bangers), Impact, sans-serif; letter-spacing: 0.05em;
+  border: 3px solid var(--ink); border-radius: 999px; box-shadow: 3px 3px 0 var(--ink);
+  padding: 4px 14px; background: #fff; cursor: pointer; transition: transform 0.08s, box-shadow 0.08s; white-space: nowrap;
+}
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.btn[aria-pressed="true"] { background: var(--red); color: #fff; }
+.btn:disabled { opacity: 0.5; cursor: wait; }
+
+.chip { border: 2px solid var(--ink); border-radius: 999px; padding: 1px 10px; font-weight: 700; font-size: 13px; background: #fff; cursor: pointer; }
+.chip:hover { background: var(--yellow); }
+
+/* speech bubbles */
+.bubble { position: relative; border: 3px solid var(--ink); border-radius: 18px; padding: 8px 12px; background: #fff; max-width: 92%; font-weight: 700; }
+.bubble.me { background: var(--blue); color: #fff; margin-left: auto; border-bottom-right-radius: 4px; }
+.bubble.bot { border-bottom-left-radius: 4px; }
+.bubble.oops { background: #ffe1e1; }
+
+.title-burst { display: inline-block; background: var(--red); color: #fff; border: 4px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); padding: 2px 16px; transform: rotate(-2deg); border-radius: 8px; }
+
+input.ink { border: 3px solid var(--ink); border-radius: 999px; padding: 6px 14px; background: #fff; font-weight: 700; outline: none; width: 100%; }
+input.ink:focus { box-shadow: 3px 3px 0 var(--blue); }
+
+code.query { display: block; white-space: pre-wrap; word-break: break-word; font-size: 12px; background: #111; color: #9effa9; padding: 8px; border-radius: 8px; margin-top: 6px; font-weight: 400; }
+
+/* the same AI with no graph: a grey "before" bubble */
+.bubble.alone { background: #e9e6df; border-style: dashed; border-bottom-left-radius: 4px; font-weight: 400; }
+.verdict { margin-left: 4px; padding: 0 6px; border-radius: 8px; border: 2px solid var(--ink); white-space: nowrap; }
+.verdict.bad { background: #ff6b6b; color: #fff; }
+.verdict.ok { background: #8ce99a; }
+/* story progress: five round step buttons */
+.step-dot { width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--ink); background: #fff; font-weight: 800; font-size: 12px; display: grid; place-items: center; }
+.step-dot.done { background: #8ce99a; }
+/* where "AI alone" went wrong */
+mark.wrong { background: #ff6b6b; color: #fff; padding: 0 3px; border-radius: 4px; text-decoration: line-through; }
+.errors { margin-top: 6px; padding: 6px 8px; border: 2px solid var(--ink); border-radius: 10px; background: #ffe1e1; font-size: 13px; font-weight: 400; }
+/* the quiet on/off buttons next to the spotlights */
+.btn.btn-small { font-size: 12px; padding: 2px 10px; box-shadow: 2px 2px 0 var(--ink); }

@@ -1,0 +1,131 @@
+{
+  "recordedAt": "2026-09-19T02:31:49.674Z",
+  "missions": {
+    "stones": {
+      "graph": {
+        "answer": "Hulk, Thanos and Iron Man.",
+        "cypher": "MATCH (c:Character)-[:WIELDED]->(s:Item {kind:'Infinity Stone'}) WITH c, collect(DISTINCT s.name) AS stones WHERE size(stones) = 6 RETURN c.name AS name, c.alias AS alias, stones ORDER BY name",
+        "names": [
+          "Bruce Banner",
+          "Hulk",
+          "Space Stone",
+          "Mind Stone",
+          "Reality Stone",
+          "Power Stone",
+          "Time Stone",
+          "Soul Stone",
+          "Thanos",
+          "Tony Stark",
+          "Iron Man"
+        ]
+      },
+      "alone": {
+        "alone": {
+          "answer": "Thanos and Tony Stark.",
+          "same": false,
+          "missing": [
+            "Hulk"
+          ],
+          "wrong": []
+        }
+      }
+    },
+    "weapons": {
+      "graph": {
+        "answer": "Captain America's Shield (Captain America). Mjolnir (Captain America and Thor). Stormbreaker (Thor).",
+        "cypher": "MATCH (t:Character {name:'Thanos'})-[:ENEMY_OF]-(c:Character)-[:WIELDED]->(i:Item {kind:'weapon'}) RETURN i.name AS weapon, collect(DISTINCT c.alias) AS wielders, t.name AS enemy ORDER BY weapon",
+        "names": [
+          "Captain America's Shield",
+          "Captain America",
+          "Thanos",
+          "Mjolnir",
+          "Thor",
+          "Stormbreaker"
+        ]
+      },
+      "alone": {
+        "alone": {
+          "answer": "Stormbreaker, Mjolnir, Iron Man's nanotech armor, and the Infinity Gauntlet.",
+          "same": false,
+          "missing": [
+            "Captain America's Shield"
+          ],
+          "wrong": []
+        }
+      }
+    },
+    "team": {
+      "graph": {
+        "answer": "Thor and Vision.",
+        "cypher": "MATCH (c:Character)-[:HAS_POWER]->(p:Power {name:'flight'}), (c)-[:MEMBER_OF]->(t:Team {name:'Avengers'}), (c)-[:WIELDED]->(m:Item {name:'Mjolnir'}) RETURN c.name AS name, c.alias AS alias, t.name AS team, p.name AS power, m.name AS item ORDER BY name",
+        "names": [
+          "Thor",
+          "Avengers",
+          "flight",
+          "Mjolnir",
+          "Vision"
+        ]
+      },
+      "alone": {
+        "alone": {
+          "answer": "Thor and Captain America.",
+          "same": false,
+          "missing": [
+            "Vision"
+          ],
+          "wrong": [
+            {
+              "label": "Captain America",
+              "why": "He cannot fly.",
+              "words": [
+                "captain america",
+                "steve rogers"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "path": {
+      "graph": {
+        "answer": "Kate Bishop —[mentored]— Clint Barton —[member of]— Avengers —[member of]— Nebula —[enemy of]— Thanos (4 links)",
+        "cypher": "MATCH (a:Character {name:'Kate Bishop'}), (b:Character {name:'Thanos'}) CALL algo.SPpaths({sourceNode: a, targetNode: b, relTypes: ['MEMBER_OF','ENEMY_OF','MENTORED','WIELDED','PARENT_OF','SIBLING_OF','SPOUSE_OF','PARTNER_OF'], relDirection: 'both', maxLen: 6, pathCount: 1}) YIELD path RETURN [n IN nodes(path) | n.name] AS chain, [r IN relationships(path) | type(r)] AS links",
+        "names": [
+          "Kate Bishop",
+          "Clint Barton",
+          "Avengers",
+          "Nebula",
+          "Thanos",
+          "MENTORED",
+          "MEMBER_OF",
+          "ENEMY_OF"
+        ]
+      },
+      "alone": {
+        "alone": {
+          "answer": "No connection; Kate Bishop and Thanos never met or shared any storyline.",
+          "same": false,
+          "missing": [
+            "Clint Barton (her mentor)"
+          ],
+          "wrong": []
+        }
+      }
+    },
+    "trap": {
+      "graph": {
+        "answer": "Nobody. The graph has no such link.",
+        "cypher": "MATCH (c:Character)-[:MEMBER_OF]->(:Team {name:'Guardians of the Galaxy'}), (c)-[:WIELDED]->(:Item {name:'Time Stone'}) RETURN c.name AS name",
+        "names": []
+      },
+      "alone": {
+        "alone": {
+          "answer": "None.",
+          "same": true,
+          "missing": [],
+          "wrong": []
+        }
+      }
+    }
+  }
+}
