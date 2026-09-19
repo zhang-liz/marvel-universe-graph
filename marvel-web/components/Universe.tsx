@@ -625,7 +625,7 @@ export default function Universe() {
             {/* one action at a time: the chat box comes after the story */}
             {saved && (
               <form className="flex gap-2 mt-1 shrink-0" onSubmit={(e) => { e.preventDefault(); const q = input.trim(); if (q) { setInput(""); ask({ question: q }, q); } }}>
-                <input className="ink" placeholder="Ask your own question…" value={input} maxLength={400} onChange={(e) => setInput(e.target.value)} />
+                <input className="ink" placeholder="Ask your own question…" value={input} maxLength={200} onChange={(e) => setInput(e.target.value)} />
                 <button className="btn !bg-red-600 !text-white text-lg" disabled={busy || !!reveal}>Ask!</button>
               </form>
             )}
