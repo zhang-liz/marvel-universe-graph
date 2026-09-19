@@ -8,7 +8,7 @@ import { MISSIONS } from "@/lib/missions";
 
 const FG = dynamic(() => import("./FG"), { ssr: false });
 
-type GNode = {
+type GNode = { shown?: string;
   id: number; label: string; name: string; alias?: string; image?: string; core?: boolean;
   kind?: string; year?: number; playedBy?: string; wiki?: string; x?: number; y?: number;
 };
@@ -62,7 +62,17 @@ function Marked({ text, wrong }: { text: string; wrong: Wrong[] }) {
   const parts = text.split(new RegExp(`(${words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "gi"));
   return <>{parts.map((s, i) => (i % 2 ? <mark key={i} className="wrong">{s}</mark> : s))}</>;
 }
-const display = (n: GNode) => (n.alias && n.alias !== n.name ? n.alias : n.name);
+const display = (n: GNode) => n.shown ?? (n.alias && n.alias !== n.name ? n.alias : n.name);
+// Two heroes can share one hero name (Clint Barton and Kate Bishop are both "Hawkeye").
+// The one with the most links keeps it on the map; the others show their real name.
+function nameSharedAliases(d: { nodes: GNode[]; links: { source: number; target: number }[] }) {
+  const degree = new Map<number, number>();
+  for (const l of d.links) for (const id of [l.source, l.target]) degree.set(id, (degree.get(id) ?? 0) + 1);
+  const owner = new Map<string, GNode>();
+  const heroes = d.nodes.filter((n) => n.label === "Character" && n.alias && n.alias !== n.name);
+  for (const n of heroes) { const o = owner.get(n.alias!); if (!o || (degree.get(n.id) ?? 0) > (degree.get(o.id) ?? 0)) owner.set(n.alias!, n); }
+  for (const n of heroes) if (owner.get(n.alias!) !== n) n.shown = n.name;
+}
 const creditUrl = (image: string) => image.replace("Special:FilePath/", "File:").replace(/\?width=\d+$/, "");
 
 // Backup for a demo with no internet: real answers, recorded before the demo by scripts/record-backup.mjs
@@ -102,6 +112,7 @@ export default function Universe() {
     const live = () => fetch("/api/graph", { signal: AbortSignal.timeout(LIVE_WAIT) }).then((r) => r.json()).then((d) => (d.error ? Promise.reject(d.error) : d));
     const saved = () => fetch("/backup/graph.json").then((r) => r.json());
     (forcedBackup() ? saved() : live().catch((e) => saved().catch(() => Promise.reject(e)))).then((d) => {
+      nameSharedAliases(d);
       (d.nodes as GNode[]).forEach((n) => { if (n.core && n.image) getImage(n.image); }); // start loading the main faces at once
       setData(d);
     }).catch((e) => setError(String(e)));
